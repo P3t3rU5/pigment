@@ -136,7 +136,7 @@ module Pigment
     def -(color)
       case color
       when Color
-        self.class.new(*self.class.supress([@color, color.color].transpose.map! do |c, d|
+        self.class.new(*self.class.supress([rgb, color.rgb].transpose.map! do |c, d|
           e = c - d
           e >= 0 ? e : e = 1 + e
           e
@@ -176,7 +176,7 @@ module Pigment
     # @param [Color] color
     # @return [Boolean]
     def ==(color)
-      color.is_a? Color && color.rgb == rgb
+      color.is_a?(Color) && color.rgb == rgb
     end
 
     # Converts a color to its grayscale correspondent
@@ -210,7 +210,7 @@ module Pigment
     # @param [Float] amount
     def interpolate(color, amount = 0.5)
       if color.is_a? Color && (-1.0..1.0).include?(amount)
-        n = [@color, color.color].transpose.map! { |c, d| c + amount * (d - c) }
+        n = [rgb, color.rgb].transpose.map! { |c, d| c + amount * (d - c) }
         self.class.new(*self.class.supress(n))
       else
         raise ArgumentError
@@ -220,7 +220,7 @@ module Pigment
     # Returns the Invert color
     # @return [Color]
     def inverse
-      self.class.new(*@color.map { |c| 1.0 - c })
+      self.class.new(*rgb.map { |c| 1.0 - c })
     end
 
     # Returns a new Color without the given channels
