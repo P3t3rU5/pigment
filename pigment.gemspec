@@ -10,7 +10,7 @@ Gem::Specification.new do |s|
   s.description   = 'A rgb color gem, with a list of 750 diferent colors defined within 869 names.'
   s.authors       = %w'P3t3rU5 SilverPhoenix99'
   s.email         = %w'pedro.megastore@gmail.com silver.phoenix99@gmail.com'
-  s.homepage      = 'https://github.com/SilverPhoenix99/pigment'
+  s.homepage      = 'https://github.com/P3t3rU5/pigment'
   s.require_paths = %w'lib'
   s.files         = Dir['{lib/**/*.rb,*.md}']
 end
