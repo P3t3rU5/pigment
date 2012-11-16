@@ -1,5 +1,5 @@
 module Pigment
-  VERSION = '0.1.2'
+  VERSION = '0.1.4'
 
   class Color
 
@@ -42,8 +42,15 @@ module Pigment
       @color[3] = alpha if alpha.is_a?(Float) && (0.0..1.0).include?(alpha)
     end
 
+    # Returns an array with the rgb components
+    # @return [Array]
     def rgb
       @color[0, 3]
+    end
+
+    def hsl
+      to_hsl
+      @hsl
     end
 
     # Return specified color by its name from the named_colors hash.
@@ -246,6 +253,7 @@ module Pigment
       h = if r == max
             h = ((g - b) / delta) / 6.0
             h += 1.0 if g < b
+            h
           elsif g == max
             ((b - r) / delta) / 6.0 + (1.0 / 3.0)
           elsif b == max
@@ -255,6 +263,7 @@ module Pigment
       h += 1 if h < 0
       h -= 1 if h > 1
       @hsl = [h, s, l]
+      self
     end
 
     # Returns an array of the color components. Alpha value is passed as well if with_alpha is set to true.
