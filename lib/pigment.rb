@@ -1,5 +1,5 @@
 module Pigment
-  VERSION = '0.1.4'
+  VERSION = '0.1.5'
 
   class Color
 
@@ -176,7 +176,7 @@ module Pigment
     # @param [Color] color
     # @return [Boolean]
     def ==(color)
-      color.is_a? Color && color.rgb == @color.rgb
+      color.is_a? Color && color.rgb == rgb
     end
 
     # Converts a color to its grayscale correspondent
