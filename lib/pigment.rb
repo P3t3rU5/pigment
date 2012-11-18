@@ -1,5 +1,5 @@
 module Pigment
-  VERSION = '0.1.8'
+  VERSION = '0.1.9'
 
   class Color
 
@@ -49,7 +49,7 @@ module Pigment
     end
 
     def hsl
-      to_hsl
+      to_hsl unless @hsl
       @hsl
     end
 
@@ -82,10 +82,10 @@ module Pigment
     end
 
 
-    # Supress an array of floats by dividing by the greatest color component.
+    # Suppress an array of floats by dividing by the greatest color component.
     # @param [Array] color
     # @return [Array]
-    def self.supress(color)
+    def self.suppress(color)
       color.map!  { |c| c / color.max } unless (0.0..1.0).include?(color.max)
       color
     end
@@ -117,26 +117,26 @@ module Pigment
       inv
     end
 
-    # Sums all the two colors components. If any component gets out of the 0 to 1.0 range its supressed.
+    # Sums all the two colors components. If any component gets out of the 0 to 1.0 range its suppressed.
     # @param [Numeric] color
     # @return [Color]
     def +(color)
       case color
       when Color
-        self.class.new(*supress([color.rgb, rgb].transpose.map! { |c, d| c + d }))
+        self.class.new(*self.class.suppress([color.rgb, rgb].transpose.map! { |c, d| c + d }))
       else
         raise ArgumentError, "Expecting Color. Given #{color.class}"
       end
     end
 
-    # Subtracts all the two color components. If any component gets out of the 0 to 1.0 range its supressed.
+    # Subtracts all the two color components. If any component gets out of the 0 to 1.0 range its suppressed.
     # If tone component gets lower than 0 it acts like its dealing with the inverse component -> 1 - component
     # @param [Numeric] color
     # @return [Color]
     def -(color)
       case color
       when Color
-        self.class.new(*self.class.supress([rgb, color.rgb].transpose.map! do |c, d|
+        self.class.new(*self.class.suppress([rgb, color.rgb].transpose.map! do |c, d|
           e = c - d
           e >= 0 ? e : e = 1 + e
           e
@@ -146,27 +146,27 @@ module Pigment
       end
     end
 
-    # Multiplies all the color components by n. If any component gets out of the 0 to 1.0 range its supressed.
+    # Multiplies all the color components by n. If any component gets out of the 0 to 1.0 range its suppressed.
     # @param [Numeric] n
     # @return [Color]
     def *(n)
       case n
       when Numeric
         n = rgb.map { |c| c * n.to_f }
-        self.class.new(*self.class.supress(n))
+        self.class.new(*self.class.suppress(n))
       else
         raise ArgumentError, "Expecting Numeric. Given #{n.class}"
       end
     end
 
-    # Divides all the color components by n. If any component gets out of the 0 to 1.0 range its supressed.
+    # Divides all the color components by n. If any component gets out of the 0 to 1.0 range its suppressed.
     # @param [Numeric] n
     # @return [Color]
     def /(n)
       case n
       when Numeric
         n = rgb.map { |c| c * n.to_f }
-        self.class.new(*self.class.supress(n))
+        self.class.new(*self.class.suppress(n))
       else
         raise ArgumentError, "Expecting Numeric. Given #{n.class}"
       end
@@ -211,7 +211,7 @@ module Pigment
     def interpolate(color, amount = 0.5)
       if color.is_a? Color && (-1.0..1.0).include?(amount)
         n = [rgb, color.rgb].transpose.map! { |c, d| c + amount * (d - c) }
-        self.class.new(*self.class.supress(n))
+        self.class.new(*self.class.suppress(n))
       else
         raise ArgumentError
       end
@@ -291,6 +291,7 @@ module Pigment
       "Color(r=#{r}, g=#{g}, b=#{b}, a=#{a}#{", [h=#{h}, s=#{s}, l=#{l}]" if @hsl})"
     end
 
+    alias_method :alpha=,        :a=
     alias_method :inv,           :inverse
     alias_method :invert,        :inverse
     alias_method :complementary, :inverse
