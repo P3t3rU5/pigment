@@ -1,5 +1,5 @@
 module Pigment
-  VERSION = '0.1.9'
+  VERSION = '0.1.10'
 
   class Color
 
@@ -270,7 +270,7 @@ module Pigment
     # @param [Boolean] with_alpha
     # @return [Array]
     def to_floats(with_alpha = false)
-      with_alpha ? @color : rgb
+      with_alpha ? @color.dup : rgb
     end
 
     # Returns an array of the color components. Alpha value is passed as well if with_alpha is set to true.

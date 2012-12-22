@@ -690,6 +690,7 @@ module Pigment
     self[:Tomato]                                                   = '#FF6347'
     self[:Toolbox]                                                  = '#746CC0'
     self[:Topaz]                                                    = '#FFC87C'
+    self[:Transparent]                                              = '#00000000'
     self[:TropicalRainForest]                                       = '#00755E'
     self[:TrueBlue]                                                 = '#0073CF'
     self[:TuftsBlue]                                                = '#417DC1'
