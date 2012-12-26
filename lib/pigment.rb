@@ -42,6 +42,19 @@ module Pigment
       @color[3] = alpha if alpha.is_a?(Float) && (0.0..1.0).include?(alpha)
     end
 
+    def r=(red)
+      @color[0] = red if red.is_a?(Float) && (0.0..1.0).include?(red)
+    end
+
+    def g=(green)
+      @color[1] = green if green.is_a?(Float) && (0.0..1.0).include?(green)
+    end
+
+    def b=(blue)
+      @color[2] = blue if blue.is_a?(Float) && (0.0..1.0).include?(blue)
+    end
+
+
     # Returns an array with the rgb components
     # @return [Array]
     def rgb
