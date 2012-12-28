@@ -14,14 +14,17 @@ Gem::Specification.new do |s|
   s.require_paths = %w'lib'
   s.files         = Dir['{lib/**/*.rb,*.md}']
   s.post_install_message = <<-eos
-+---------------------------------------------------+
++----------------------------------------------------------------------------+
   Thanks for choosing Pigment.
 
-  =================================================
+  ==========================================================================
   #{Pigment::VERSION} Changes:
-    - Fixed to_floats to use dup.
-    - Added Transparent Color
-  =================================================
+    - WARNING: Color#to_floats now returns alpha by default
+    - Added Color#dup
+    - Dynamically defined setters for r, g and b
+    - Removed Color#hsl
+    - Corrected Color#remove_channels
+  ==========================================================================
 
   If you like what you see, support us on Pledgie:
     http://www.pledgie.com/campaigns/18945
@@ -29,6 +32,6 @@ Gem::Specification.new do |s|
   If you find any bugs, please report them on
     https://github.com/P3t3rU5/pigment/issues
 
-+---------------------------------------------------+
++----------------------------------------------------------------------------+
   eos
 end

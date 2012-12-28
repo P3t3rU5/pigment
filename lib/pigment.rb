@@ -1,5 +1,5 @@
 module Pigment
-  VERSION = '0.1.10'
+  VERSION = '0.2.0'
 
   class Color
 
@@ -27,31 +27,14 @@ module Pigment
                end
     end
 
-    # Selectors.
+    # Selectors and Setters.
     %w'r g b a'.each_with_index do |m, i|
-      define_method("#{m}", ->() { color[i] })
+      define_method("#{m}", ->() { @color[i] })
+      define_method("#{m}=", ->(value) { @color[i] = value if value.is_a?(Float) && (0.0..1.0).include?(value) })
     end
 
     %w'h s l'.each_with_index do |m, i|
       define_method("#{m}", ->() { hsl[i] })
-    end
-
-    # Set alpha value. Only accepts float values
-    # @param [Float] alpha
-    def a=(alpha)
-      @color[3] = alpha if alpha.is_a?(Float) && (0.0..1.0).include?(alpha)
-    end
-
-    def r=(red)
-      @color[0] = red if red.is_a?(Float) && (0.0..1.0).include?(red)
-    end
-
-    def g=(green)
-      @color[1] = green if green.is_a?(Float) && (0.0..1.0).include?(green)
-    end
-
-    def b=(blue)
-      @color[2] = blue if blue.is_a?(Float) && (0.0..1.0).include?(blue)
     end
 
 
@@ -59,11 +42,6 @@ module Pigment
     # @return [Array]
     def rgb
       @color[0, 3]
-    end
-
-    def hsl
-      to_hsl unless @hsl
-      @hsl
     end
 
     # Return specified color by its name from the named_colors hash.
@@ -192,6 +170,11 @@ module Pigment
       color.is_a?(Color) && color.rgb == rgb
     end
 
+    # @return [Color]
+    def dup
+      self.class.new(*@color)
+    end
+
     # Converts a color to its grayscale correspondent
     # @return [Color]
     def grayscale
@@ -240,10 +223,11 @@ module Pigment
     # @param [Array of Symbols] channels
     # @return [Color]
     def remove_channels(*channels)
-      r = 0 if channels.include? :r
-      g = 0 if channels.include? :g
-      b = 0 if channels.include? :b
-      self.class.new(r, g, b)
+      color = self.class.new(r, g, b, a)
+      %w'r g b a'.each do |attr|
+        color.send("#{attr}=", 0) if channels.include? attr.to_sym
+      end
+      color
     end
 
     # Creates an instance variable to keep the HSL values of a RGB color.
@@ -282,21 +266,21 @@ module Pigment
     # Returns an array of the color components. Alpha value is passed as well if with_alpha is set to true.
     # @param [Boolean] with_alpha
     # @return [Array]
-    def to_floats(with_alpha = false)
+    def to_floats(with_alpha = true)
       with_alpha ? @color.dup : rgb
     end
 
     # Returns an array of the color components. Alpha value is passed as well if with_alpha is set to true.
     # @param [Boolean] with_alpha
     # @return [Array]
-    def to_ints(with_alpha = false)
+    def to_ints(with_alpha = true)
       to_floats(with_alpha).map { |v| Integer(v * 255) }
     end
 
     # Returns an array of the color components. Alpha value is passed as well if with_alpha is set to true.
     # @param [Boolean] with_alpha
     # @return [Array]
-    def to_hex(with_alpha = false)
+    def to_hex(with_alpha = true)
       to_ints(with_alpha).map { |v| '%02x' % v }.join
     end
 
@@ -316,6 +300,7 @@ module Pigment
     alias_method :to_a,          :to_floats
     alias_method :to_ary,        :to_floats
     alias_method :to_f,          :to_floats
+    alias_method :to_hsl,        :hsl
   end
 end
 
