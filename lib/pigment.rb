@@ -1,5 +1,5 @@
 module Pigment
-  VERSION = '0.2.0'
+  VERSION = '0.2.1'
 
   class Color
 
@@ -205,7 +205,7 @@ module Pigment
     # @param [Color] color
     # @param [Float] amount
     def interpolate(color, amount = 0.5)
-      if color.is_a? Color && (-1.0..1.0).include?(amount)
+      if color.is_a?(Color) && (-1.0..1.0).include?(amount)
         n = [rgb, color.rgb].transpose.map! { |c, d| c + amount * (d - c) }
         self.class.new(*self.class.suppress(n))
       else

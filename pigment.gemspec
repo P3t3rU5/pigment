@@ -19,11 +19,7 @@ Gem::Specification.new do |s|
 
   ==========================================================================
   #{Pigment::VERSION} Changes:
-    - WARNING: Color#to_floats now returns alpha by default
-    - Added Color#dup
-    - Dynamically defined setters for r, g and b
-    - Removed Color#hsl
-    - Corrected Color#remove_channels
+    - Corrected Color#interpolate
   ==========================================================================
 
   If you like what you see, support us on Pledgie:
