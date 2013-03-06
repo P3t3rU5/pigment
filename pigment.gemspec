@@ -19,7 +19,13 @@ Gem::Specification.new do |s|
 
   ==========================================================================
   #{Pigment::VERSION} Changes:
-    - Corrected Color#interpolate
+    -  Added method chaining for #r, #g, #b and #a methods for example 
+		color.rgggba returns an array with r, g, g, g, b, a.
+    - Color[] now accepts more than one argument and returns an array of 
+		colors or just one color.
+		- Version is now Frozen.
+		- Added license.
+
   ==========================================================================
 
   If you like what you see, support us on Pledgie:
