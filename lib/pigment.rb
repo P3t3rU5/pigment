@@ -1,5 +1,5 @@
 module Pigment
-  VERSION = '0.2.1'
+  VERSION = '0.2.2'.freeze
 
   class Color
 
@@ -27,7 +27,7 @@ module Pigment
                end
     end
 
-    # Selectors and Setters.
+    # Getters and Setters.
     %w'r g b a'.each_with_index do |m, i|
       define_method("#{m}", ->() { @color[i] })
       define_method("#{m}=", ->(value) { @color[i] = value if value.is_a?(Float) && (0.0..1.0).include?(value) })
@@ -37,18 +37,18 @@ module Pigment
       define_method("#{m}", ->() { hsl[i] })
     end
 
-
-    # Returns an array with the rgb components
-    # @return [Array]
-    def rgb
-      @color[0, 3]
+    def method_missing(method, *args)
+      # Returns an array with the respective rgba components
+      # @return [Array]
+      super unless method =~ /(a|b|g|r)+/ && args.empty?
+      method.size.times.map{ |i| send(method[i]) }
     end
 
     # Return specified color by its name from the named_colors hash.
     # @param [Symbol] name
-    # @return [Color]
-    def self.[](name)
-      @named_colors[name]
+    # @return [Array]
+    def self.[](*colors)
+      colors.size > 1 ? colors.map { |color| @named_colors[color] } : @named_colors[colors[0]]
     end
 
     # Add name to a color , add it to the named_colors hash and defines a constant.
@@ -71,7 +71,6 @@ module Pigment
     def self.named_colors_sorted
       named_colors.sort
     end
-
 
     # Suppress an array of floats by dividing by the greatest color component.
     # @param [Array] color

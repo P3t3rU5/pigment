@@ -742,6 +742,7 @@ module Pigment
     self[:WildWatermelon]                                           = '#FC6C85'
     self[:Wine]                                                     = '#722F37'
     self[:Wisteria]                                                 = '#C9A0DC'
+    self[:WPFButton]                                                = '#DDDDDD'
     self[:Xanadu]                                                   = '#738678'
     self[:YaleBlue]                                                 = '#0F4D92'
     self[:YellowGreen]                                              = '#9ACD32'
