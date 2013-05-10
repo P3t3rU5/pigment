@@ -8,6 +8,7 @@ Gem::Specification.new do |s|
   s.version       = Pigment::VERSION
   s.summary       = 'A rgb color gem, with a list of 750 different colors.'
   s.description   = 'A rgb color gem, with a list of 750 different colors defined within 869 names.'
+  s.license       = 'MIT'
   s.authors       = %w'P3t3rU5 SilverPhoenix99'
   s.email         = %w'pedro.megastore@gmail.com silver.phoenix99@gmail.com'
   s.homepage      = 'https://github.com/P3t3rU5/pigment'
@@ -19,12 +20,7 @@ Gem::Specification.new do |s|
 
   ==========================================================================
   #{Pigment::VERSION} Changes:
-    -  Added method chaining for #r, #g, #b and #a methods for example 
-		color.rgggba returns an array with r, g, g, g, b, a.
-    - Color[] now accepts more than one argument and returns an array of 
-		colors or just one color.
-		- Version is now Frozen.
-		- Added license.
+    - Corrected Color#== to include alpha
 
   ==========================================================================
 

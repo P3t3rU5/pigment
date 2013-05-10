@@ -1,5 +1,5 @@
 module Pigment
-  VERSION = '0.2.2'.freeze
+  VERSION = '0.2.3'.freeze
 
   class Color
 
@@ -166,7 +166,7 @@ module Pigment
     # @param [Color] color
     # @return [Boolean]
     def ==(color)
-      color.is_a?(Color) && color.rgb == rgb
+      color.is_a?(Color) && color.rgba == rgba
     end
 
     # @return [Color]
