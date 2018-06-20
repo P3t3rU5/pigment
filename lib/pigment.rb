@@ -1,47 +1,57 @@
 module Pigment
-  VERSION = '0.2.2'.freeze
+  VERSION = '0.3.2'.freeze
 
   class Color
 
     @named_colors = {}
     attr_reader :color, :hsl
 
-    # Pigment uses sRGB or sRGBA as the default color system
-    # color can be a hexadecimal code preceded by a '#' like '#FF4CB2' or a array of floats (1.0, 0.3, 0.7)
-    # or an array of integers between 0 and 255 (153, 255, 31)
-    # @param [String, Array] color
-    def initialize(*color)
-      @color = case
-               when color[0] =~ /^#([a-fA-F0-9]{2})([a-fA-F0-9]{2})([a-fA-F0-9]{2})([a-fA-F0-9]{2})?$/
-                 [$1, $2, $3, $4 || 'ff'].map { |v| v.to_i(16) / 255.0 }
-               when color.is_a?(Array) && (color.all? { |c| (0.0..1.0).include? c }) && color.length == 3
-                 [color, 1.0].flatten!
-               when color.is_a?(Array) && (color.all? { |c| (0..255).include? c && c.is_a?(Integer) } ) && color.length == 3
-                 [color.map { |c| c / 255.0 }, 1.0].flatten!
-               when color.is_a?(Array) && (color.all? { |c| (0.0..1.0).include? c }) && color.length == 4
-                 color
-               when color.is_a?(Array) && (color.all? { |c| (0..255).include? c && c.is_a?(Integer) } ) && color.length == 4
-                 color.map { |c| c / 255.0 }
-               else
-                 raise ArgumentError, "Expected String or Array with length 3 or 4. Given #{color.class} with length = #{color.length}"
-               end
+    # Creates a Pigment::Color from an HTML Hex code String
+    # @param [String] hex
+    # @return [Pigment::Color]
+    def self.from_hex(hex)
+      raise ArgumentError, "Invalid hex color format: #{hex.inspect}" unless /^#(?<r>\h{2})(?<g>\h{2})(?<b>\h{2})(?<a>\h{2})?$/ =~ hex
+      color = [r, g, b, a || 'ff'].map { |v| v.to_i(16) / 255.0 }
+      new(*color)
     end
 
-    # Getters and Setters.
-    %w'r g b a'.each_with_index do |m, i|
-      define_method("#{m}", ->() { @color[i] })
-      define_method("#{m}=", ->(value) { @color[i] = value if value.is_a?(Float) && (0.0..1.0).include?(value) })
+    # Creates a Pigment::Color from a group of rgba Integers
+    # @return [Pigment::Color]
+    # @param [Integer] r
+    # @param [Integer] g
+    # @param [Integer] b
+    # @param [Integer] a
+    def self.from_rgba(r, g, b, a = 255)
+      color = [r, g, b, a]
+      raise ArgumentError, "Invalid Integer color format: #{color.inspect}" unless color.all? { |c| (0..255).include?(c) && c.is_a?(Integer) }
+      color.map { |c| c / 255.0 }
+      new(*color)
     end
 
-    %w'h s l'.each_with_index do |m, i|
-      define_method("#{m}", ->() { hsl[i] })
+    def self.from_rgb(r, g, b)
+      from_rgba(r, g, b)
     end
 
-    def method_missing(method, *args)
-      # Returns an array with the respective rgba components
-      # @return [Array]
-      super unless method =~ /(a|b|g|r)+/ && args.empty?
-      method.size.times.map{ |i| send(method[i]) }
+    # Creates a Pigment::Color form the HSL color System. It's mostly used to calculate harmonic colors.
+    # @param [Float] h
+    # @param [Float] s
+    # @param [Float] l
+    # @return [Pigment::Color]
+    def self.from_hsl(h, s, l)
+      return new(l, l, l) if s == 0
+      v2 = l < 0.5 ? l * (1 + s) : (l + s) - (s * l)
+      v1 = 2 * l - v2
+      color = [h + (1 / 3.0), h, h - (1 / 3.0)].map do |hv|
+        case
+        when hv < 0 then hv += 1
+        when hv > 1 then hv -= 1
+        when 6 * hv < 1 then v1 +(v2 - v1) * 6 * hv
+        when 2 * hv < 1 then v2
+        when 3 * hv < 2 then v1 + (v2 - v1) * ((2 / 3.0)- hv) * 6
+        else v1
+        end
+      end
+      new(*color)
     end
 
     # Return specified color by its name from the named_colors hash.
@@ -53,9 +63,9 @@ module Pigment
 
     # Add name to a color , add it to the named_colors hash and defines a constant.
     # @param [Array of Strings] names
-    # @param [Color] color
+    # @param [Pigment::Color] color
     def self.[]=(*names, color)
-      color = new(color) unless color.is_a? Color
+      raise ArgumentError, "Expects Pigment::Color but got #{color.inspect}" unless color.is_a? Color
       names.each do |name|
         @named_colors[name.downcase] = color
         const_set("#{name}".to_sym, color)
@@ -80,26 +90,34 @@ module Pigment
       color
     end
 
-    # Creates a Color form the HSL color System. It's mostly used to calculate harmonic colors.
-    # @param [Float] h
-    # @param [Float] s
-    # @param [Float] l
-    # @return [Color]
-    def self.from_hsl(h, s, l)
-      return new(l, l, l) if s == 0
-      v2 = l < 0.5 ? l * (1 + s) : (l + s) - (s * l)
-      v1 = 2 * l - v2
-      color = [h + (1 / 3.0), h, h - (1 / 3.0)].map do |hv|
-        case
-        when hv < 0 then hv += 1
-        when hv > 1 then hv -= 1
-        when 6 * hv < 1 then v1 +(v2 - v1) * 6 * hv
-        when 2 * hv < 1 then v2
-        when 3 * hv < 2 then v1 + (v2 - v1) * ((2 / 3.0)- hv) * 6
-        else v1
-        end
-      end
-      new(*color)
+    # Pigment uses sRGB or sRGBA as the default color system
+    # Pigment::Color is represented as an array of floats, which are ranged from 0.0 to 1.0
+    # @param [Float] r
+    # @param [Float] g
+    # @param [Float] b
+    # @param [Float] a
+    # @return [Pigment::Color]
+    def initialize(r, g, b, a = 1.0)
+      color = [r, g, b, a]
+      raise ArgumentError, "Invalid Float color format: #{color.inspect}" unless color.all? { |c| (0.0..1.0).include?(c) && c.is_a?(Float) }
+      @color = color
+    end
+
+    # Getters and Setters.
+    %w'r g b a'.each_with_index do |m, i|
+      define_method("#{m}", ->() { @color[i] })
+      define_method("#{m}=", ->(value) { @color[i] = value if value.is_a?(Float) && (0.0..1.0).include?(value) })
+    end
+
+    %w'h s l'.each_with_index do |m, i|
+      define_method("#{m}", ->() { hsl[i] })
+    end
+
+    def method_missing(method, *args)
+      # Returns an array with the respective rgba components
+      # @return [Array]
+      super unless method =~ /(a|b|g|r)+/ && args.empty?
+      method.size.times.map{ |i| send(method[i]) }
     end
 
     # Same as inverse.
@@ -109,7 +127,7 @@ module Pigment
 
     # Sums all the two colors components. If any component gets out of the 0 to 1.0 range its suppressed.
     # @param [Numeric] color
-    # @return [Color]
+    # @return [Pigment::Color]
     def +(color)
       case color
       when Color
@@ -122,7 +140,7 @@ module Pigment
     # Subtracts all the two color components. If any component gets out of the 0 to 1.0 range its suppressed.
     # If tone component gets lower than 0 it acts like its dealing with the inverse component -> 1 - component
     # @param [Numeric] color
-    # @return [Color]
+    # @return [Pigment::Color]
     def -(color)
       case color
       when Color
@@ -138,7 +156,7 @@ module Pigment
 
     # Multiplies all the color components by n. If any component gets out of the 0 to 1.0 range its suppressed.
     # @param [Numeric] n
-    # @return [Color]
+    # @return [Pigment::Color]
     def *(n)
       case n
       when Numeric
@@ -151,7 +169,7 @@ module Pigment
 
     # Divides all the color components by n. If any component gets out of the 0 to 1.0 range its suppressed.
     # @param [Numeric] n
-    # @return [Color]
+    # @return [Pigment::Color]
     def /(n)
       case n
       when Numeric
@@ -163,21 +181,21 @@ module Pigment
     end
 
     # Test if two colors are equal
-    # @param [Color] color
+    # @param [Pigment::Color] color
     # @return [Boolean]
     def ==(color)
       color.is_a?(Color) && color.rgb == rgb
     end
 
-    # @return [Color]
+    # @return [Pigment::Color]
     def dup
       self.class.new(*@color)
     end
 
     # Converts a color to its grayscale correspondent
-    # @return [Color]
+    # @return [Pigment::Color]
     def grayscale
-      r = g = b = (self.r + self.g + self.b)/3
+      r = g = b = (self.r + self.g + self.b) / 3
       self.class.new(r, g, b)
     end
 
@@ -223,9 +241,7 @@ module Pigment
     # @return [Color]
     def remove_channels(*channels)
       color = self.class.new(r, g, b, a)
-      %w'r g b a'.each do |attr|
-        color.send("#{attr}=", 0) if channels.include? attr.to_sym
-      end
+      %w'r g b a'.each { |attr| color.send("#{attr}=", 0) if channels.include? attr.to_sym }
       color
     end
 
@@ -284,7 +300,7 @@ module Pigment
     end
 
     def to_s
-      "Color(r=#{r}, g=#{g}, b=#{b}, a=#{a}#{", [h=#{h}, s=#{s}, l=#{l}]" if @hsl})"
+      "Color(r: #{r}, g: #{g}, b: #{b}, a: #{a}#{", [h: #{h}, s: #{s}, l: #{l}]" if @hsl})"
     end
 
     alias_method :alpha=,        :a=
