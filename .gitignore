@@ -1,2 +1,7 @@
 /.idea
 /test
+/doc/
+/coverage/
+/.yardoc/
+/Gemfile.lock
+/*.gem
