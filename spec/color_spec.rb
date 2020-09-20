@@ -303,8 +303,6 @@ RSpec.describe 'Pigment::Color' do
 
   describe '#rectangular_include?' do
     it 'returns true' do
-      puts rectangular_from_red
-      puts rgb_red.rectangular.map { |color| color.into(Pigment::Color::HSL)}
       expect(rgb_red.rectangular_include?(*rectangular_from_red)).to be true
       expect(hsl_red.rectangular_include?(*rectangular_from_red)).to be true
     end
