@@ -96,6 +96,10 @@ RSpec.describe 'Pigment::Color::RGB' do
     it 'does not accept non numeric values' do
       expect { Pigment::Color::RGB.new(Object.new, 0, 0) }.to raise_error NoMethodError
     end
+
+    it "should be created even with approximation errors" do
+      expect { Pigment::Color::RGB.new(0.8063725490196079, 1.0000000000000004, 0.8666666666666667, 1.0) }.not_to raise_error
+    end
   end
 
   describe '#dup' do

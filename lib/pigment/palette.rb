@@ -36,6 +36,7 @@ module Pigment
     # @param [Array] names
     # @param [Pigment::Color] color
     # @return [Pigment::Color]
+    # @raise ArgumentError
     def []=(*names, color)
       raise ArgumentError, "Expects Pigment::Color but got #{color.inspect}" unless color.is_a? Pigment::Color
       names.each { |name| @colors[name] = color }

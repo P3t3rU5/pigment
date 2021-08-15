@@ -13,7 +13,7 @@ Gem::Specification.new do |gem|
   gem.files         = Dir['{lib/**/*.rb,*.md}']
   gem.add_development_dependency 'rspec', '~> 3'
   gem.add_development_dependency 'pry', '~> 0.13'
-  gem.add_development_dependency 'simplecov', '~> 0.19'
+  gem.add_development_dependency 'simplecov', '~> 0'
   gem.add_development_dependency 'rake', '~> 13'
   gem.add_development_dependency 'yard', '~> 0.9'
   gem.post_install_message = <<-eos

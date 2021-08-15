@@ -12,8 +12,8 @@ module Pigment
       class << self
         # Converts a color into RGB format from any possible format
         # @param [Pigment::Color] color
-        # @raise [InvalidColorFormatError]
         # @return [Pigment::Color]
+        # @raise [InvalidColorFormatError]
         def convert(color)
           case color
           when RGB then color
@@ -23,9 +23,9 @@ module Pigment
         end
 
         # Creates a Pigment::Color::RGB from an HTML Hex code String
-        # @param [String, Integer] hex
-        # @raise [InvalidColorFormatError]
+        # @param [String, Integer, Float] hex
         # @return [Pigment::Color::RGB]
+        # @raise [InvalidColorFormatError]
         def from_hex(hex)
           case hex
           when String  then from_hex_string(hex)
@@ -40,8 +40,8 @@ module Pigment
         # @param [Integer] green
         # @param [Integer] blue
         # @param [Integer] alpha
-        # @raise [InvalidColorFormatError]
         # @return [Pigment::Color::RGB]
+        # @raise [InvalidColorFormatError]
         def from_rgba_integers(red, green, blue, alpha = 255)
           color = [red, green, blue, alpha]
           raise InvalidColorFormatError, color unless color.all? do |c|
@@ -126,18 +126,22 @@ module Pigment
       # @param [Float, Integer] green between 0.0 and 1.0
       # @param [Float, Integer] blue between 0.0 and 1.0
       # @param [Float, Integer] alpha between 0.0 and 1.0
-      # @raise [InvalidColorFormatError]
       # @return [Pigment::Color::RGB]
+      # @raise [InvalidColorFormatError]
       def initialize(red, green, blue, alpha = 1.0)
-        @red, @green, @blue, @alpha = red.to_f, green.to_f, blue.to_f, alpha.to_f
+        @red   = red.to_f.snap
+        @green = green.to_f.snap
+        @blue  = blue.to_f.snap
+        @alpha = alpha.to_f
+
         color = to_floats(with_alpha: true)
         raise InvalidColorFormatError, color unless color.all? { |c| c.between?(0.0, 1.0) }
       end
 
       # Sums all the two colors components. If any component gets out of the 0 to 1.0 range it gets suppressed.
       # @param [Pigment::Color] color
-      # @raise [InvalidColorFormatError]
       # @return [Pigment::Color::RGB]
+      # @raise [InvalidColorFormatError]
       def +(color)
         raise InvalidColorFormatError, color unless color.is_a?(Pigment::Color)
         color = color.into(self.class)
@@ -153,8 +157,8 @@ module Pigment
       # Subtracts all the two color components. If any component gets out of the 0 to 1.0 range it gets suppressed.
       # Tone component will be 0 if it gets lower than 0
       # @param [Pigment::Color] color
-      # @raise [InvalidColorFormatError]
       # @return [Pigment::Color::RGB]
+      # @raise [InvalidColorFormatError]
       def -(color)
         raise InvalidColorFormatError, color unless color.is_a?(Pigment::Color)
         color = color.into(self.class)
@@ -209,8 +213,8 @@ module Pigment
       # Interpolates two colors. Amount must be an float between -1.0 and 1.0
       # @param [Pigment::Color] color
       # @param [Float] amount
-      # @raise [InvalidColorFormatError]
       # @return [Pigment::Color::RGB]
+      # @raise [InvalidColorFormatError]
       def interpolate(color, amount = 0.5)
         raise InvalidColorFormatError, color unless color.is_a?(Pigment::Color)
         raise ArgumentError, "Amount must be an float between -1.0 and 1.0, got #{amount}" unless (-1.0..1.0).include?(amount)

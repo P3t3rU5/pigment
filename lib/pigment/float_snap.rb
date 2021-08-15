@@ -7,7 +7,7 @@ module Pigment
 
     refine Float do
       def snap
-        ceil(Pigment::FloatSnap.snap_digits)
+        round(Pigment::FloatSnap.snap_digits)
       end
     end
   end

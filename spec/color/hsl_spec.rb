@@ -56,6 +56,10 @@ RSpec.describe 'Pigment::Color::HSL' do
     it 'Accepts alpha value' do
       expect(Pigment::Color::HSL.new(0, 1, 0.5, 1)).to eq hsl_red
     end
+
+    it "should be created even with approximation errors" do
+      expect { Pigment::Color::RGB.new(0.3852320675105485, 1.0000000000000004, 0.9031862745098039, 1.0) }.not_to raise_error
+    end
   end
 
   describe '#into' do

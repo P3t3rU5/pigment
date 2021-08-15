@@ -53,10 +53,14 @@ module Pigment
       # @param [#to_f] saturation between 0.0 and 1.0
       # @param [#to_f] lightness between 0.0 and 1.0
       # @param [#to_f] alpha between 0.0 and 1.0
-      # @raise [InvalidColorFormatError]
       # @return [Pigment::Color::HSL]
+      # @raise [InvalidColorFormatError]
       def initialize(hue, saturation, lightness, alpha = 1.0)
-        @hue, @saturation, @lightness, @alpha = hue % 1.0, saturation.to_f, lightness.to_f, alpha.to_f
+        @hue        = hue % 1.0
+        @saturation = saturation.to_f.snap
+        @lightness  = lightness.to_f.snap
+        @alpha      = alpha.to_f.snap
+
         color = to_f(with_alpha: true)
         raise InvalidColorFormatError, color unless color.all? { |c| c.between?(0.0, 1.0) }
       end
